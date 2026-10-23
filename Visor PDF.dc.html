@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#EEECE8;}
+a{color:#1F1E1C;}a:hover{color:#55524C;}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;font-family:'TikTok Sans',system-ui,sans-serif;color:#1F1E1C;">
+  <header style="position:sticky;top:0;z-index:5;background:#FAF9F7;border-bottom:1px solid #DEDBD5;">
+    <div style="max-width:960px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <sc-if value="{{ hasLogo }}" hint-placeholder-val="{{ false }}">{{ logoEl }}</sc-if>
+      <sc-if value="{{ noLogo }}" hint-placeholder-val="{{ true }}">
+        <div style="height:32px;padding:0 12px;border:1px dashed #B9B4AB;border-radius:6px;display:flex;align-items:center;font-size:13px;color:#77726A;">Logo</div>
+      </sc-if>
+      <div style="flex:1;min-width:160px;display:flex;flex-direction:column;gap:2px;">
+      </div>
+      <a href="{{ downloadUrl }}" download="{{ fileName }}" onClick="{{ onDownload }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 18px;border-radius:8px;background:#FE2C55;color:#FFFFFF;font-size:14px;font-weight:600;text-decoration:none;" style-hover="background:#E0204A;color:#FFFFFF;">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"></path></svg>
+        Descargar PDF
+      </a>
+    </div>
+  </header>
+  <main style="flex:1;width:100%;max-width:960px;margin:0 auto;padding:24px 20px 48px;box-sizing:border-box;">
+    <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+      <div style="padding:80px 0;text-align:center;font-size:14px;color:#6B665E;">Cargando documento…</div>
+    </sc-if>
+    <sc-if value="{{ hasError }}" hint-placeholder-val="{{ false }}">
+      <div style="padding:80px 0;text-align:center;font-size:14px;color:#6B665E;display:flex;flex-direction:column;gap:12px;align-items:center;">
+        <div>No se pudo mostrar el documento en esta página.</div>
+        <a href="{{ pdfUrl }}" target="_blank" onClick="{{ onOpen }}" style="font-weight:500;">Abrir el PDF</a>
+      </div>
+    </sc-if>
+    <div ref="{{ pagesRef }}" style="display:flex;flex-direction:column;gap:16px;"></div>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;logoUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;logo-tiktok.png&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Marca&quot;},&quot;pdfUrl&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Guia-TikTok.pdf&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Documento&quot;},&quot;fileName&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Guia-TikTok.pdf&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Documento&quot;}}">
+class Component extends DCLogic {
+  state = { pages: 0, loading: true, error: false };
+  pagesRef = React.createRef();
+  pdf() { return this.props.pdfUrl || 'Guia-TikTok.pdf'; }
+  componentDidMount() { this.track('vista'); this.load(); }
+  track(ev) {
+    const fn = { vista: 'track-view', descarga: 'track-download' }[ev];
+    if (!fn) return;
+    const q = '/.netlify/functions/' + fn;
+    try { if (!(navigator.sendBeacon && navigator.sendBeacon(q))) fetch(q, { method: 'POST', keepalive: true }).catch(() => {}); } catch (e) {}
+  }
+  async load() {
+    try {
+      const base = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.4.168/';
+      const lib = await import(base + 'pdf.min.mjs');
+      lib.GlobalWorkerOptions.workerSrc = base + 'pdf.worker.min.mjs';
+      const url = new URL(this.pdf(), location.href).href;
+      const doc = await lib.getDocument(url).promise;
+      this.setState({ pages: doc.numPages, loading: false });
+      let el = this.pagesRef.current, t = 0;
+      while (!el && t++ < 50) { await new Promise(r => setTimeout(r, 50)); el = this.pagesRef.current; }
+      if (!el) throw new Error('contenedor no disponible');
+      el.innerHTML = '';
+      const w = Math.min(el.clientWidth || 900, 920);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      for (let i = 1; i <= doc.numPages; i++) {
+        const page = await doc.getPage(i);
+        const vp1 = page.getViewport({ scale: 1 });
+        const vp = page.getViewport({ scale: (w / vp1.width) * dpr });
+        const c = document.createElement('canvas');
+        c.width = vp.width; c.height = vp.height;
+        c.style.cssText = 'width:100%;height:auto;display:block;background:#fff;border-radius:2px;box-shadow:0 1px 2px rgba(31,30,28,.08),0 4px 16px rgba(31,30,28,.06);';
+        el.appendChild(c);
+        await page.render({ canvasContext: c.getContext('2d'), viewport: vp }).promise;
+      }
+    } catch (e) { console.error(e); this.setState({ loading: false, error: true }); }
+  }
+  renderVals() {
+    const logo = this.props.logoUrl || 'logo-tiktok.png';
+    const n = this.state.pages;
+    return {
+      pdfUrl: this.pdf(),
+      downloadUrl: '/Guia-TikTok.pdf',
+      fileName: this.props.fileName || 'Guia-TikTok.pdf',
+      hasLogo: !!logo, noLogo: !logo,
+      logoEl: logo ? React.createElement('img', { src: logo, alt: 'Logo', style: { height: 32, width: 'auto', display: 'block' } }) : null,
+      pagesLabel: n ? n + ' páginas' : 'PDF',
+      loading: this.state.loading, hasError: this.state.error,
+      pagesRef: this.pagesRef,
+      onDownload: () => this.track('descarga'),
+      onOpen: () => this.track('vista_externa'),
+    };
+  }
+}
+</script>
+</body>
+</html>

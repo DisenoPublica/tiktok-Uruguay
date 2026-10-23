@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="robots" content="noindex,nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=TikTok+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#EEECE8;}
+a{color:#1F1E1C;}a:hover{color:#FE2C55;}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-direction:column;font-family:'TikTok Sans',system-ui,sans-serif;color:#1F1E1C;">
+  <header style="background:#FAF9F7;border-bottom:1px solid #DEDBD5;">
+    <div style="max-width:960px;margin:0 auto;padding:14px 20px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+      <img src="logo-tiktok.png" alt="TikTok" style="height:32px;width:auto;display:block;">
+      <div style="flex:1;min-width:160px;font-size:13px;color:#6B665E;">Estadísticas privadas</div>
+      <button onClick="{{ refresh }}" style="display:flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:8px;border:1px solid #DEDBD5;background:#FFFFFF;color:#1F1E1C;font-family:inherit;font-size:14px;font-weight:500;cursor:pointer;" style-hover="border-color:#1F1E1C;">
+        <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M13.5 8a5.5 5.5 0 1 1-1.6-3.9M13.5 2.5v3h-3"></path></svg>
+        Actualizar
+      </button>
+    </div>
+  </header>
+  <main style="flex:1;width:100%;max-width:960px;margin:0 auto;padding:40px 20px 56px;box-sizing:border-box;display:flex;flex-direction:column;gap:24px;">
+    <div style="display:flex;flex-direction:column;gap:6px;">
+      <div style="font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#FE2C55;">Estadísticas del documento</div>
+      <div style="font-size:32px;font-weight:700;line-height:1.1;text-wrap:pretty;">Rendimiento del documento</div>
+    </div>
+
+    <sc-if value="{{ needKey }}" hint-placeholder-val="{{ false }}">
+      <form onSubmit="{{ submitKey }}" style="background:#FFFFFF;border:1px solid #DEDBD5;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:12px;max-width:420px;">
+        <div style="font-size:16px;font-weight:600;">Ingresá tu clave</div>
+        <div style="font-size:14px;color:#6B665E;line-height:1.4;">{{ keyMsg }}</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          <input name="k" type="password" placeholder="STATS_KEY" style="flex:1;min-width:160px;height:44px;padding:0 12px;border:1px solid #DEDBD5;border-radius:8px;font-family:inherit;font-size:14px;box-sizing:border-box;">
+          <button type="submit" style="height:44px;padding:0 18px;border:none;border-radius:8px;background:#FE2C55;color:#FFFFFF;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;" style-hover="background:#E0204A;">Ver datos</button>
+        </div>
+      </form>
+    </sc-if>
+
+    <sc-if value="{{ showStats }}" hint-placeholder-val="{{ true }}">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;">
+        <div style="background:#FFFFFF;border:1px solid #DEDBD5;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:#55524C;">
+            <div style="width:32px;height:32px;border-radius:8px;background:#E6FAFB;color:#0F9BA3;display:flex;align-items:center;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 8S4 3.5 8 3.5 14.5 8 14.5 8 12 12.5 8 12.5 1.5 8 1.5 8Z"></path><circle cx="8" cy="8" r="2"></circle></svg>
+            </div>
+            Visualizaciones
+          </div>
+          <div style="font-size:56px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;">{{ views }}</div>
+        </div>
+        <div style="background:#FFFFFF;border:1px solid #DEDBD5;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:16px;">
+          <div style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:500;color:#55524C;">
+            <div style="width:32px;height:32px;border-radius:8px;background:#FFE8ED;color:#FE2C55;display:flex;align-items:center;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v8M4.5 7 8 10.5 11.5 7M3 13.5h10"></path></svg>
+            </div>
+            Descargas
+          </div>
+          <div style="font-size:56px;font-weight:700;line-height:1;font-variant-numeric:tabular-nums;">{{ downloads }}</div>
+        </div>
+      </div>
+      <div style="background:#1F1E1C;color:#FAF9F7;border-radius:12px;padding:24px;display:flex;flex-direction:column;gap:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px;flex-wrap:wrap;">
+          <div style="font-size:14px;font-weight:500;color:#D9D6D0;">Tasa de descarga</div>
+          <div style="font-size:32px;font-weight:700;font-variant-numeric:tabular-nums;">{{ rate }}</div>
+        </div>
+        <div style="height:8px;border-radius:4px;background:#3A3834;overflow:hidden;">
+          <div style="height:100%;width:{{ rateWidth }};background:#FE2C55;border-radius:4px;transition:width .6s ease;"></div>
+        </div>
+        <div style="font-size:13px;color:#B9B4AB;">{{ rateNote }}</div>
+      </div>
+      <div style="font-size:13px;color:#6B665E;">{{ status }}</div>
+    </sc-if>
+  </main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { data: null, needKey: false, keyMsg: '', err: '', at: null, loading: true };
+  key() {
+    const q = new URLSearchParams(location.search).get('key');
+    if (q) { try { localStorage.setItem('pdfStatsKey', q); } catch (e) {} return q; }
+    try { return localStorage.getItem('pdfStatsKey') || ''; } catch (e) { return ''; }
+  }
+  componentDidMount() { this.load(); this.iv = setInterval(() => this.load(), 30000); }
+  componentWillUnmount() { clearInterval(this.iv); }
+  async load() {
+    this.setState({ loading: true });
+    try {
+      const k = this.key();
+      const r = await fetch('/.netlify/functions/stats' + (k ? '?key=' + encodeURIComponent(k) : ''), { cache: 'no-store' });
+      if (r.status === 401) {
+        this.setState({ needKey: true, loading: false, keyMsg: k ? 'La clave no es correcta. Probá de nuevo.' : 'Esta página es privada. Usá la clave que configuraste en Netlify (STATS_KEY).' });
+        return;
+      }
+      if (!r.ok) throw new Error(r.status);
+      const data = await r.json();
+      this.setState({ data, needKey: false, err: '', at: new Date(), loading: false });
+    } catch (e) {
+      this.setState({ err: 'No se pudo conectar con el servidor. Esta página funciona una vez publicada en Netlify.', loading: false });
+    }
+  }
+  fmt(n) { return new Intl.NumberFormat('es-AR').format(n); }
+  renderVals() {
+    const d = this.state.data;
+    const v = d ? d.views : 0, dl = d ? d.downloads : 0;
+    const pct = v ? Math.min(100, (dl / v) * 100) : 0;
+    const at = this.state.at;
+    return {
+      needKey: this.state.needKey, keyMsg: this.state.keyMsg, showStats: !this.state.needKey,
+      views: d ? this.fmt(v) : '—', downloads: d ? this.fmt(dl) : '—',
+      rate: d && v ? pct.toFixed(1).replace('.', ',') + '%' : '—',
+      rateWidth: pct + '%',
+      rateNote: d && v ? 'De cada 100 visitas, ' + Math.round(pct) + ' terminan en descarga.' : 'Aparece cuando haya visitas registradas.',
+      status: this.state.loading ? 'Actualizando…' : this.state.err || (at ? 'Actualizado ' + at.toLocaleString('es-AR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) + ' · se refresca cada 30 s' : ''),
+      refresh: () => this.load(),
+      submitKey: (e) => {
+        e.preventDefault();
+        const k = new FormData(e.target).get('k');
+        try { localStorage.setItem('pdfStatsKey', k || ''); } catch (er) {}
+        this.load();
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

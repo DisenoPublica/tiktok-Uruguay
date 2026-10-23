@@ -1,0 +1,19 @@
+PLANTILLA – VISOR DE PDF CON CONTADOR
+
+CÓMO ARMAR CADA PLATAFORMA
+1. Duplicá esta carpeta (una copia por plataforma).
+2. Reemplazá "Guia-TikTok.pdf" por tu PDF, con EXACTAMENTE ese nombre: Guia-TikTok.pdf
+3. En Netlify: Add new site → Import from Git (o "netlify deploy --prod" con Netlify CLI).
+   No usar Netlify Drop (arrastrar carpeta): no publica las funciones del contador.
+4. Elegí el nombre del sitio en Site configuration → Change site name.
+
+CONTADOR
+- Cada sitio tiene su propio contador (visitas y descargas), empieza en 0 y no se mezcla con los otros.
+- Ver datos: https://TU-SITIO.netlify.app/datos
+- JSON crudo: https://TU-SITIO.netlify.app/.netlify/functions/stats
+
+REINICIAR EL CONTADOR DE UN SITIO
+En netlify/functions/ (los 3 archivos), cambiá name: "pdf-stats" por otro nombre (ej. "pdf-stats-2") y volvé a publicar.
+
+LOGO
+Reemplazá logo-tiktok.png manteniendo el nombre.

@@ -1,0 +1,21 @@
+[build]
+  publish = "."
+
+[functions]
+  directory = "netlify/functions"
+  node_bundler = "esbuild"
+
+[[headers]]
+  for = "/Guia-TikTok.pdf"
+  [headers.values]
+    Content-Disposition = "attachment; filename=\"Guia-TikTok.pdf\""
+
+[[redirects]]
+  from = "/datos"
+  to = "/Estadisticas.dc.html"
+  status = 200
+
+[[redirects]]
+  from = "/"
+  to = "/Visor%20PDF.dc.html"
+  status = 200
